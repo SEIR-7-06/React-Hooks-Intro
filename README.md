@@ -21,7 +21,7 @@
 - Using Hooks
 - Rules of Using Hooks
 - Essential Questions
-- Further Study
+- Custom Hooks
 
 ## Intro
 
