@@ -96,7 +96,7 @@ We are going to be refactoring our existing gamelib client from class based comp
 
 ### 💪 Practice Refactoring GameList.js
 
-Jump into GameList.js and remove the current class based component for a functional component. For now we will just return a div with the h1 saying "All Games".
+Jump into GameList.js and remove the current class based component and frame up a functional component. For now we will just return a div with the h1 saying "All Games".
 
 In: `src/pages/GameList.js`
 
@@ -209,7 +209,7 @@ Now click that button and watch our state update! You should see the zero turn i
 Time to get the state games onto the page! 
 
 1. Create a generateList function inside our component that will return an array of GameCard components.
-2. Call that function inside our render with a conditional to render only if there are games available within our state. 
+2. Inside the GameList render, write a conditional statement to check for existing games in our state, and invoke the generateList function if they exist. 
 
 In: `src/pages/GameList.js`
 
