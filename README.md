@@ -579,7 +579,7 @@ export default GameShow;
 <details>
   <summary>Solution</summary>
 
-In: `src/pages/GameShow.js`
+In: `src/pages/NewGame.js`
 
 ```js
 import React, { useState } from "react";
@@ -665,7 +665,182 @@ Custom hooks may call other hooks such as `useState()`, etc.
 For an example, and to learn more, start by checking out [Building Your Own Hooks](https://reactjs.org/docs/hooks-custom.html) in the docs.
 
 ## Creating our own useGames hook.
-... 
+
+As we discussed at the moment we have repeating logic in our GameList.js and GameShow.js that is our fetch functions. Let's convert this into a custom hook and dry up our code! 
+
+1. Create a new directory called hooks inside src `$ mkdir src/hooks`
+2. Create a file called useGames.js inside the hooks directory `$ touch src/hooks/useGames.js`
+
+Now let's set up the base of our custom hook.
+
+In: `src/hooks/useGames.js`
+
+```js
+// notice we did not import React. 
+// This is not a component so we only need the useState and useEffect functionality
+import { useState, useEffect } from "react";
+
+import GameModel from "../models/game";
+
+// we will define our custom hook with the use naming convention
+function useGames() {
+  const [games, setGames] = useState([]);
+  
+  // fetch games now exists inside of our custom hook to handle fetching data. 
+  function fetchGames() {
+      GameModel.all().then((data) => {
+        setGames(data.games);
+      });
+  }
+
+  // when this hook is ran we will run by default the fetchGames function to update our state
+  useEffect(
+    function () {
+      fetchGames();
+    },
+    []
+  );
+  
+  // we will return our games state and function to refetch in case we need it
+  return [games, fetchGames];
+}
+
+export default useGames;
+```
+
+> Key Point: just like how useState returns an array of a state in index one and a function in index two our function will the same. Now we are only requesting data so we will return a custom function that will only request new data when needed. 
+
+### Using our custom hook.
+
+Let's use our useGames hook inside our GamesList component. 
+
+1. Remove useState and useEffect from our component. Our custom hook will handle this for us now. 
+2. Remove the GameModel import. 
+3. Remove the fetchGames function.
+4. Import our useGames hook.
+5. Replace our useState call inside our component with our useGames hook.
+
+In: `src/pages/GameList.js`
+
+```js
+import React from "react";
+import { Link } from "react-router-dom";
+
+// import useGames hook
+import useGames from "../hooks/useGames";
+import GameCard from "../components/GameCard";
+
+function GameList(props) {
+  // replace useState with our hook replacing the setGames with fetchGames
+  const [games, fetchGames] = useGames();
+  
+  function generateList(games) {
+    return games.map((game, index) => (
+      <Link to={`/games/${game._id}`} key={index}>
+        <GameCard {...game} />
+      </Link>
+    ));
+  }
+  
+  return (
+    <div>
+      <h1>All Games</h1>
+      { games.length }
+      {games.length ? generateList(games) : "Loading..."}
+      <button onClick={fetchGames} >Get Games</button>
+    </div>
+  );
+}
+
+export default GameList;
+```
+
+And just like that we have replaced a large chuck of code in our component with a custom hook! So satisfying... 
+
+<img src="https://media.giphy.com/media/jQDozgWeDXUoQZ1htF/giphy.gif" />
+
+### But wait! What about the GameShow?
+
+At the moment our hook only handles getting all games. Let's modify our hook so that IF it receives an id then it will fetch and return a single game from the api.  
+
+1. Add a param of gameId to the hook. 
+2. We will now use this gameId in our fetchGames function. Add an id param to fetchGames.
+3. In fetchGames add an `if else` statement that IF the id is provided we will update state with .show vs .all
+4. In our useEffect we must now add the gameId as a dependency so our hook will auto fetch new info on id change. 
+5. Pass the id into fetchGames within our useEffect and we are all set! 
+
+In: `src/hooks/useGames.js`
+
+```js
+import { useState, useEffect } from "react";
+
+import GameModel from "../models/game";
+
+// add a param of gameId 
+function useGames(gameId) {
+  const [games, setGames] = useState([]);
+
+  // allow the fetchGames function to recieve an id
+  function fetchGames(id) {
+    // if id is provided get one game by id
+    if (id) {
+      GameModel.show(id).then((data) => {
+        setGames(data.game);
+      });
+      // id not provided get all games
+    } else {
+      GameModel.all().then((data) => {
+        setGames(data.games);
+      });
+    }
+  }
+
+  useEffect(
+    function () {
+      fetchGames(gameId);
+    },
+    [gameId]
+  );
+
+  return [games, fetchGames];
+}
+
+export default useGames;
+```
+
+Our custom hook is now ready to be used in the GameShow component. 
+Time to refactor! 
+
+1. Remove useState and useEffect from our component. Our custom hook will handle this for us now. 
+2. Remove the GameModel import. 
+3. Remove the fetchGame function.
+4. Import our useGames hook passing in the id from the url params.
+5. Replace our useState call inside our component with our useGames hook.
+
+In: `src/pages/GameShow.js`
+
+```js
+import React from "react";
+import useGames from "../hooks/useGames";
+
+import GameCard from "../components/GameCard";
+
+function GameShow(props) {
+  const [game] = useGames(props.match.params.id);
+
+  return (
+    <div>
+      <GameCard {...game} />
+    </div>
+  );
+}
+
+export default GameShow;
+```
+
+Look how small our component is now!
+
+<img src="https://media.giphy.com/media/1yiPWNsQ1vq7V90fRY/giphy.gif" />
 
 
 ## References
