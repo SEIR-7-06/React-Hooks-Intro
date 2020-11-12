@@ -31,7 +31,11 @@ This lesson will cover the use case of hooks and demonstrate how to use the two 
 
 ## Set Up
 
-- `cd` into the `sei/react/gamelib/gamelib-client` folder for this lesson.
+Set up for this lesson will be a little more involved. First we'll create a new branch and pull down the solution code. After that branch has been created we can then create a second branch to practice using hooks by refactoring one of the gamelib components. 
+
+- Navigate to your `gamelib-client` repo.
+- Create a new branch called solution with `$ git checkout -b solution`
+- Now pull the full solution code with `$ git pull origin solution`
 - Open the project in VS Code: `$ code .`
 - Open a terminal in VS Code (`ctrl + backtick`)
 - Create a new branch called hooks `$ git checkout -b hooks`
@@ -41,7 +45,7 @@ This lesson will cover the use case of hooks and demonstrate how to use the two 
 
 ## Why use React Hooks?
 
-Fact: Hooks don't add any additional functionality in React applications.
+Fact: Hooks don't add any additional functionality to React applications.
 
 So, if hooks don't bring any new features to React apps, one might wonder why they've been added to the library.
 
@@ -49,7 +53,7 @@ The short answer is that hooks enable functional components to use the capabilit
 
 Capabilities such as the ability to:
 
-- Remember and update state.
+- Store and update state.
 - Run code in a way similar to using lifecycle methods.
 
 > IMPORTANT:  Hooks are backward-compatible and can be used side-by-side with classes and existing code so you can start using them gradually when you feel the urge to do so.
